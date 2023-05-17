@@ -3,15 +3,20 @@ from sqlite3 import Error
 
 
 def create_database(file):
-    conn = None
+    connection = None
     try:
-        conn = sqlite3.connect(file)
+        connection = sqlite3.connect(file)
         print(sqlite3.version)
     except Error as e:
         print(e)
-    finally:
-        if conn:
-            conn.close()
+    cursor = connection.cursor()
+
+    cursor.execute("""CREATE TABLE zipcodes
+                        (id INTEGER, cityID TEXT)""")
+    cursor.execute("""CREATE TABLE cities
+                        (id TEXT, latitude REAL, longitude REAL)""")
+    if connection:
+        connection.close()
 
 
 if __name__ == '__main__':
