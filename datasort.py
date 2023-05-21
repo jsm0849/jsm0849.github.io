@@ -1,6 +1,7 @@
 import sqlite3
 import csv
 from City import City
+import math
 
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
@@ -11,80 +12,57 @@ with open("city_info_modified.csv", 'r') as csvfile:
     csvReader = csv.reader(csvfile)
     for row in csvReader:
         command = "INSERT INTO cities VALUES('" + row[0] + "', '" + row[1] + "', '" + row[2] + "')"
-        print(command)
         cursor.execute(command)
 csvfile.close()
 
 # Sorting Cities in ascending order by latitude and longitude
-cities = []     # Array of Cities retrieved from the database.
-arrLat = []     # Array of Cities sorted in ascending order by latitude.
-arrLong = []    # Array of Cities sorted in ascending order by longitude.
-closeCityLat = []   # Array of Cities that are close to the current zip code by latitude.
-closeCityLong = []  # Array of Cities that are close to the current zip code by longitude.
+cities = []     # Array of city data retrieved from the database.
+arrCities = []  # Array of City objects retrieved from the database.
 cursor.execute("SELECT * FROM cities")
 cities = cursor.fetchall()
 
-# Populating the arrays to be sorted by latitude and longitude
+# Populating the array with City objects using data from the database:
 for row in cities:
-    print(row[0], row[1], row[2])
-    arrLat.append(City(row[0], row[1], row[2]))
-    arrLong.append(City(row[0], row[1], row[2]))
-# Sorting one array of Cities in ascending order by latitude
-for i in range(len(arrLat)):
-    for j in range(len(arrLat) - 1):
-        city = arrLat[j]
-        nextCity = arrLat[j + 1]
-        if city.latitude > nextCity.latitude:
-            tempCity = arrLat[j]
-            arrLat[j] = arrLat[j + 1]
-            arrLat[j + 1] = tempCity
-
-# Sorting the second array of Cities in ascending order by longitude
-for i in range(len(arrLong)):
-    for j in range(len(arrLong) - 1):
-        city = arrLong[j]
-        nextCity = arrLong[j + 1]
-        if city.longitude > nextCity.longitude:
-            tempCity = arrLong[j]
-            arrLong[j] = arrLong[j + 1]
-            arrLong[j + 1] = tempCity
+    arrCities.append(City(row[0], row[1], row[2]))
 
 # Retrieving the zip codes from the csv file
 with open("ZIPlatlong.csv", 'r') as csvfile:
     csvReader = csv.reader(csvfile)
-    latStack = []       # Stack of Cities sorted by latitude, closest to zip code are on top
-    longStack = []      # Stack of Cities sorted by longitude, closest to zip code are on top
+    zipFileRows = []    # List of rows to be added to the zipData.csv file.
+    closestCity = City(0, 0, 0)      # Stores the closest city to the current zip code so far.
+    closestCityDistance = [0, -1]    # Stores the distance to current zip code and id of the closest city so far.
     for row in csvReader:
-        # This section ensures the top five elements in both latStack and longStack are the five closest latitudes and
-        # longitudes to the coordinates of the current zip code.
-        for i in range(len(arrLat)):
-            latStack.append(arrLat[i])
-            if arrLat[i].latitude <= float(row[1]):
-                if i < len(arrLat) - 1:
-                    latStack.append(arrLat[i + 1])
-                if i < len(arrLat) - 2:
-                    latStack.append(arrLat[i + 2])
-                break
-        for i in range(len(arrLong)):
-            longStack.append(arrLong[i])
-            if arrLong[i].longitude <= float(row[2]):
-                if i < len(arrLong) - 1:
-                    longStack.append(arrLat[i + 1])
-                if i < len(arrLong) - 2:
-                    longStack.append(arrLong[i + 2])
-                break
-        # This section finds a match between latStack and longStack, the coordinates of the closest City to the current
-        # zip code.
-        for i in range(5):
-            closeCityLat.append(latStack.pop())
-            closeCityLong.append(longStack.pop())
-        for i in range(len(closeCityLat)):
-            for j in range(len(closeCityLong)):
-                if closeCityLat[i].id == closeCityLong[j].id:
-                    command = ("INSERT INTO zipcodes VALUES('" + row[0] + "', '" + closeCityLat[i].latitude + "', '" +
-                                closeCityLat[i].longitude + "', '" + closeCityLat[i].id + "')")
-                    print(command)
-                    cursor.execute(command)
+        # This section finds the city closest to the current zip code.
+        latDistance = 0
+        longDistance = 0
+        distance = 0
+        closestCityDistance = [0, -1]
+        # Finding the city with the smallest distance to the current zip code. Each degree of latitude is about 69 miles
+        # apart, and each degree of longitude is about 53 miles apart in most of the United States.
+        for i in range(len(arrCities)):
+            latDistance = abs(float(arrCities[i].latitude) - float(row[1])) * 69
+            longDistance = abs(float(arrCities[i].longitude) - float(row[2])) * 53
+            distance = math.sqrt(latDistance ** 2 + longDistance ** 2)
+            # if the previously closest city found is not as close as the current city, or if this is the first city:
+            if closestCityDistance[1] == -1 or closestCityDistance[1] > distance:
+                closestCityDistance = [arrCities[i].id, distance]
+                closestCity = City(arrCities[i].id, arrCities[i].latitude, arrCities[i].longitude)
+        # Adding the zip code to the list to be written to file now that the closest city has been found.
+        zipFileRows.append([row[0], closestCity.latitude, closestCity.longitude, closestCity.id])
+    # Writing the completed list of zip codes with associated cities to a file (for accuracy verification).
+    with open("zipData.csv", mode='w') as zip_file:
+        zip_writer = csv.writer(zip_file)
+        zip_writer.writerows(zipFileRows)
+    zip_file.close()
+    # Reading the data back from the file and adding it to the zipcodes table in the database now that I've verified its
+    # accuracy.
+    with open("zipData.csv", mode='r') as zip_file:
+        fileReader = csv.reader(zip_file)
+        for row in fileReader:
+            if(len(row) > 0):
+                command = "INSERT INTO zipcodes VALUES('" + row[0] + "', '" + row[3] + "')"
+                cursor.execute(command)
+    zip_file.close()
 csvfile.close()
 
 # Associating zip codes with their closest cities
