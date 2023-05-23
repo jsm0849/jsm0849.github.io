@@ -6,7 +6,6 @@ def create_database(file):
     connection = None
     try:
         connection = sqlite3.connect(file)
-        print(sqlite3.version)
     except Error as e:
         print(e)
     cursor = connection.cursor()
@@ -15,6 +14,8 @@ def create_database(file):
                         (id INTEGER, cityID TEXT)""")
     cursor.execute("""CREATE TABLE cities
                         (id TEXT, latitude REAL, longitude REAL)""")
+    cursor.execute("""CREATE TABLE days 
+                        (id TEXT, medianTemp REAL, medianRain REAL)""")
     if connection:
         connection.close()
 
