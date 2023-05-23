@@ -27,6 +27,7 @@ with open("city_info_modified.csv", 'r') as city_file:
     for row in cityReader:
         command = "INSERT INTO cities VALUES('" + row[0] + "', '" + row[1] + "', '" + row[2] + "')"
         cursor.execute(command)
+        connection.commit()
 city_file.close()
 
 # Sorting Cities in ascending order by latitude and longitude
@@ -76,6 +77,7 @@ with open("ZIPlatlong.csv", 'r') as zip_origin_file:
             if (len(row) > 0):
                 command = "INSERT INTO zipcodes VALUES('" + row[0] + "', '" + row[3] + "')"
                 cursor.execute(command)
+                connection.commit()
     zip_file.close()
 zip_origin_file.close()
 
@@ -115,5 +117,7 @@ for i in range(len(arrCities)):
             medianRain = str(day[0].getMedianRain())
             id = key + '_' + arrCities[i].id
             command = "INSERT INTO days VALUES('" + id + "', '" + medianTemp + "', '" + medianRain + "')"
+            cursor.execute(command)
+            connection.commit()
     weather_file.close()
 connection.close()
