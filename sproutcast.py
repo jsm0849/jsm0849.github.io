@@ -55,7 +55,7 @@ with streamlit.form("input_form"):
     if submitted:
         inputZipcode = str(streamlit.session_state["inputZipcode"])
         extraWater = str(streamlit.session_state["extraWater"])
-        if not inputZipcode.isDigit():
+        if not inputZipcode.isdigit():
             streamlit.error("Please enter a valid zip code.")
         else:
             inputZipcode = int(inputZipcode)
