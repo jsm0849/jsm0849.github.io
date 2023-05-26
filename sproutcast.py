@@ -59,7 +59,7 @@ with streamlit.form("input_form"):
             streamlit.error("Please enter a valid zip code.")
         else:
             inputZipcode = int(inputZipcode)
-            command = "SELECT * FROM zipcodes WHERE id = '" + inputZipcode + "'"
+            command = "SELECT * FROM zipcodes WHERE id = '" + str(inputZipcode) + "'"
             if cursor.execute(command) == None:
                 streamlit.error("Please enter a valid zip code.")
             else:
