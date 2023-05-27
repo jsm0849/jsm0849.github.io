@@ -55,6 +55,8 @@ with streamlit.form("input_form"):
             plant_checkboxes.append(streamlit.checkbox(label=f"{plant[i]}", key=plant[i]))
     "---"
     submitted = streamlit.form_submit_button("Submit Form")
+
+    # Input data validation:
     if submitted:
         inputZipcode = str(streamlit.session_state["inputZipcode"])
         extraWater = str(streamlit.session_state["extraWater"])
@@ -63,7 +65,11 @@ with streamlit.form("input_form"):
         else:
             inputZipcode = int(inputZipcode)
             command = "SELECT * FROM zipcodes WHERE id = '" + str(inputZipcode) + "'"
-            if cursor.execute(command) == None:
+            streamlit.write(command)
+            cursor.execute(command)
+            zip = cursor.fetchone()
+            streamlit.write(zip)
+            if zip == None:
                 streamlit.error("Please enter a valid zip code.")
             else:
                 if not is_number(extraWater) and extraWater != '':
