@@ -1,5 +1,8 @@
 import sqlite3
 import streamlit
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 
 
 def is_number(string):
@@ -44,6 +47,7 @@ cursor = connection.cursor()
 
 # Form to take user inputs
 textValid = False   # Bool indicating whether the text field inputs were valid.
+allInputsValid = False  # Bool indicating whether all input fields are valid.
 streamlit.header(f"Tell us about your garden! Please enter your information below.")
 with streamlit.form("input_form"):
     col1, col2, col3 = streamlit.columns(3)
@@ -65,10 +69,8 @@ with streamlit.form("input_form"):
         else:
             inputZipcode = int(inputZipcode)
             command = "SELECT * FROM zipcodes WHERE id = '" + str(inputZipcode) + "'"
-            streamlit.write(command)
             cursor.execute(command)
             zip = cursor.fetchone()
-            streamlit.write(zip)
             if zip == None:
                 streamlit.error("Please enter a valid zip code.")
             else:
@@ -82,5 +84,18 @@ with streamlit.form("input_form"):
         if len(selected_plants) == 0:
             streamlit.error("Please select at least one plant being grown in your garden.")
         elif textValid:
-            streamlit.write("All inputs valid!")
+            allInputsValid = True
+
+    # Web scraper and other code to retrieve the necessary data:
+    if allInputsValid:
+        today = datetime.today()
+        currentDay = today - timedelta(days=1)  # Holds the current date needed to loop through the past week.
+        for i in range(1):
+            dateText = currentDay.strftime("%Y%m%d")
+            streamlit.write(dateText)
+            URL = "https://www.wpc.ncep.noaa.gov/qpf/obsmaps/p24i_" + dateText + "_sortbyarea.txt"
+            page = requests.get(URL)
+            soup = BeautifulSoup(page.content, "html.parser")
+            text = soup.find("pre")
+            streamlit.write(text)
 connection.close()
