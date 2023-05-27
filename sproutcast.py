@@ -121,8 +121,6 @@ with streamlit.form("input_form"):
             for j in range(len(data)):
                 if j > 1:  # Ignoring the first two rows, which are whitespace.
                     entries.append(data[j].split())
-            latitude = "38.40352427808116"
-            longitude = "-85.3711418113746"
             if i == 0:
                 # Finding the coordinates of the closest weather station to the user's zip code:
                 for k in range(len(entries) - 1):
