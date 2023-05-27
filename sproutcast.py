@@ -1,7 +1,7 @@
 import sqlite3
 import streamlit
 import math
-import re
+from City import City
 from urllib.request import urlopen
 from datetime import datetime, timedelta
 
@@ -26,6 +26,7 @@ soil_types = {}     # Dictionary to hold the available soil types and their abil
 soil = []
 selected_plants = []  # Array to hold the plants the user has growing in their garden.
 plant_checkboxes = []  # Array of bools to hold the statuses of each checkbox.
+inputZipcode = '0'
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
 cursor = connection.cursor()
@@ -96,6 +97,16 @@ with streamlit.form("input_form"):
         # This segment loops through all days in the past week, scraping data from the National Weather Service website
         # about precipitation.
         closest = []  # Holds the latitude and longitude and distance of the closest weather center to the zip code.
+        command = "SELECT * FROM zipcodes WHERE id = '" + str(inputZipcode) + "'"
+        cursor.execute(command)
+        zipcode = cursor.fetchone()
+        command = "SELECT * FROM cities WHERE id = '" + zipcode[1] + "'"
+        cursor.execute(command)
+        cityTuple = cursor.fetchone()
+        city = City(cityTuple[0], cityTuple[1], cityTuple[2])
+        streamlit.write(city)
+        latitude = city.latitude
+        longitude = city.longitude
         for i in range(6):
             data = []  # Array to hold a list of all data points on the page.
             entries = []  # Array of Lists to hold entries for each set of coordinates in the country.
