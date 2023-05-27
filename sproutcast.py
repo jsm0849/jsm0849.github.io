@@ -20,6 +20,7 @@ plant_types = {}    # Dictionary to hold the available plant types and their wat
 plant = []
 soil_types = {}     # Dictionary to hold the available soil types and their ability to retain water.
 soil = []
+selected_plants = []  # Array to hold the plants the user has growing in their garden.
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
 cursor = connection.cursor()
@@ -41,15 +42,16 @@ cursor.close()
 cursor = connection.cursor()
 
 # Form to take user inputs
+textValid = False   # Bool indicating whether the text field inputs were valid.
 streamlit.header(f"Tell us about your garden! Please enter your information below.")
 with streamlit.form("input_form"):
-    col1, col2, col3, col4 = streamlit.columns(4)
+    col1, col2, col3 = streamlit.columns(4)
     col1.text_input("Enter your five digit zipcode:", key="inputZipcode")
+    col2.selectbox("Select Soil Type:", soil, key="selectedSoil")
+    col3.text_input("Enter the amount of extra water given in the last week in inches:", key="extraWater", placeholder="0")
     with streamlit.expander("Select which plants you are growing in your garden"):
         for i in range(len(plant)):
             streamlit.checkbox(label=f"{plant[i]}", key=plant[i])
-    col3.selectbox("Select Soil Type:", soil, key="selectedSoil")
-    col4.text_input("Enter the amount of extra water given in the last week in inches:", key="extraWater", placeholder="0")
     "---"
     submitted = streamlit.form_submit_button("Submit Form")
     if submitted:
@@ -59,12 +61,19 @@ with streamlit.form("input_form"):
             streamlit.error("Please enter a valid zip code.")
         else:
             inputZipcode = int(inputZipcode)
-            command = "SELECT * FROM zipcodes WHERE id = '" + inputZipcode + "'"
+            command = "SELECT * FROM zipcodes WHERE id = '" + str(inputZipcode) + "'"
             if cursor.execute(command) == None:
                 streamlit.error("Please enter a valid zip code.")
             else:
-                if not is_number(extraWater):
+                if not is_number(extraWater) and extraWater != '':
                     streamlit.error("Please enter a valid number of inches of water recently given.")
                 else:
-                    print("continue on")
+                    textValid = True
+        for i in range(len(plant)):
+            if streamlit.session_state(plant[i]):
+                selected_plants.append(plant[i])
+        if len(selected_plants) == 0:
+            streamlit.error("Please select at least one plant being grown in your garden.")
+        elif textValid:
+            streamlit.write("All inputs valid!")
 connection.close()
