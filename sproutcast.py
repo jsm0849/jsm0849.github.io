@@ -97,6 +97,6 @@ with streamlit.form("input_form"):
             URL = "https://www.wpc.ncep.noaa.gov/qpf/obsmaps/p24i_" + dateText + "_sortbyarea.txt"
             page = urlopen(URL)
             html = page.read().decode("utf-8")
-            pageText = re.search("<pre>.*?</pre>", html)
+            pageText = re.search("<pre.*?>.*?</pre.*?>", html, re.IGNORECASE)
             streamlit.write(pageText)
 connection.close()
