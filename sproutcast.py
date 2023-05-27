@@ -21,6 +21,7 @@ plant = []
 soil_types = {}     # Dictionary to hold the available soil types and their ability to retain water.
 soil = []
 selected_plants = []  # Array to hold the plants the user has growing in their garden.
+plant_checkboxes = []  # Array of bools to hold the statuses of each checkbox.
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
 cursor = connection.cursor()
@@ -51,7 +52,7 @@ with streamlit.form("input_form"):
     col3.text_input("Enter the amount of extra water given in the last week in inches:", key="extraWater", placeholder="0")
     with streamlit.expander("Select which plants you are growing in your garden"):
         for i in range(len(plant)):
-            streamlit.checkbox(label=f"{plant[i]}", key=plant[i])
+            plant_checkboxes[i] = streamlit.checkbox(label=f"{plant[i]}", key=plant[i])
     "---"
     submitted = streamlit.form_submit_button("Submit Form")
     if submitted:
@@ -70,7 +71,7 @@ with streamlit.form("input_form"):
                 else:
                     textValid = True
         for i in range(len(plant)):
-            if streamlit.session_state(plant[i]):
+            if plant_checkboxes[i]:
                 selected_plants.append(plant[i])
         if len(selected_plants) == 0:
             streamlit.error("Please select at least one plant being grown in your garden.")
