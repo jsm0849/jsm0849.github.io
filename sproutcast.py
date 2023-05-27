@@ -24,9 +24,15 @@ plant_types = {}    # Dictionary to hold the available plant types and their wat
 plant = []
 soil_types = {}     # Dictionary to hold the available soil types and their ability to retain water.
 soil = []
-selected_plants = []  # Array to hold the plants the user has growing in their garden.
-plant_checkboxes = []  # Array of bools to hold the statuses of each checkbox.
-inputZipcode = '0'
+plant_checkboxes = []   # Array of bools to hold the statuses of each checkbox.
+# Necessary data for the Random Forest algorithm:
+selected_plants = []    # Array to hold the plants the user has growing in their garden.
+selected_soil = ""      # Holds the soil type selected by the user.
+inputZipcode = "0"      # Holds the zipcode of the user.
+recent_rain = 0         # Holds the amount of rain the user got within the last week (inches).
+city_id = ""            # Holds the ID of the City closest to the user for which there is data available.
+extra_water = ""        # Number of inches of extra water the user gave their garden in the last week.
+
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
 cursor = connection.cursor()
@@ -65,7 +71,7 @@ with streamlit.form("input_form"):
     # Input data validation:
     if submitted:
         inputZipcode = str(streamlit.session_state["inputZipcode"])
-        extraWater = str(streamlit.session_state["extraWater"])
+        extra_water = str(streamlit.session_state["extraWater"])
         if not inputZipcode.isdigit():
             streamlit.error("Please enter a valid zip code.")
         else:
@@ -76,7 +82,7 @@ with streamlit.form("input_form"):
             if zip == None:
                 streamlit.error("Please enter a valid zip code.")
             else:
-                if not is_number(extraWater) and extraWater != '':
+                if not is_number(extra_water) and extra_water != '':
                     streamlit.error("Please enter a valid number of inches of water recently given.")
                 else:
                     textValid = True
@@ -90,6 +96,7 @@ with streamlit.form("input_form"):
 
     # Web scraper and other code to retrieve the necessary data:
     if allInputsValid:
+        selected_soil = str(streamlit.session_state["selectedSoil"])
         today = datetime.today()
         currentDay = today - timedelta(days=1)  # Holds the current date needed to loop through the past week.
         recent_rain = 0  # Holds the total rainfall in inches at the user's location in the past week.
@@ -104,7 +111,7 @@ with streamlit.form("input_form"):
         cursor.execute(command)
         cityTuple = cursor.fetchone()
         city = City(cityTuple[0], cityTuple[1], cityTuple[2])
-        streamlit.write(city)
+        city_id = cityTuple[0]
         latitude = city.latitude
         longitude = city.longitude
         for i in range(6):
@@ -136,5 +143,4 @@ with streamlit.form("input_form"):
                     recent_rain = recent_rain + float(entries[k][2])
                     break
             currentDay = currentDay - timedelta(days=1)
-        streamlit.write(closest, recent_rain)
 connection.close()
