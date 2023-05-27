@@ -45,7 +45,7 @@ cursor = connection.cursor()
 textValid = False   # Bool indicating whether the text field inputs were valid.
 streamlit.header(f"Tell us about your garden! Please enter your information below.")
 with streamlit.form("input_form"):
-    col1, col2, col3 = streamlit.columns(4)
+    col1, col2, col3 = streamlit.columns(3)
     col1.text_input("Enter your five digit zipcode:", key="inputZipcode")
     col2.selectbox("Select Soil Type:", soil, key="selectedSoil")
     col3.text_input("Enter the amount of extra water given in the last week in inches:", key="extraWater", placeholder="0")
