@@ -96,6 +96,6 @@ with streamlit.form("input_form"):
             URL = "https://www.wpc.ncep.noaa.gov/qpf/obsmaps/p24i_" + dateText + "_sortbyarea.txt"
             page = requests.get(URL)
             soup = BeautifulSoup(page.content, "html.parser")
-            text = soup.find("pre")
-            streamlit.write(text)
+            requestText = soup.find("pre")
+            streamlit.write(requestText)
 connection.close()
