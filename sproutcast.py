@@ -52,7 +52,7 @@ with streamlit.form("input_form"):
     col3.text_input("Enter the amount of extra water given in the last week in inches:", key="extraWater", placeholder="0")
     with streamlit.expander("Select which plants you are growing in your garden"):
         for i in range(len(plant)):
-            plant_checkboxes[i] = streamlit.checkbox(label=f"{plant[i]}", key=plant[i])
+            plant_checkboxes.append(streamlit.checkbox(label=f"{plant[i]}", key=plant[i]))
     "---"
     submitted = streamlit.form_submit_button("Submit Form")
     if submitted:
