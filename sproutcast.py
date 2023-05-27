@@ -1,7 +1,8 @@
 import sqlite3
 import streamlit
 import requests
-from bs4 import BeautifulSoup
+import re
+from urllib.request import urlopen
 from datetime import datetime, timedelta
 
 
@@ -94,8 +95,8 @@ with streamlit.form("input_form"):
             dateText = currentDay.strftime("%Y%m%d")
             streamlit.write(dateText)
             URL = "https://www.wpc.ncep.noaa.gov/qpf/obsmaps/p24i_" + dateText + "_sortbyarea.txt"
-            page = requests.get(URL)
-            soup = BeautifulSoup(page.content, "html.parser")
-            requestText = soup.find("pre")
-            streamlit.write(requestText)
+            page = urlopen(URL)
+            html = page.read().decode("utf-8")
+            pageText = re.search("<pre>.*?</pre>", html)
+            streamlit.write(pageText)
 connection.close()
