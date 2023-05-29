@@ -1,10 +1,10 @@
 import pandas
 import numpy
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn.metrics import r2_score
-from sklearn import tree
+from model_selection import train_test_split
+from ensemble import RandomForestRegressor
+from metrics import mean_absolute_error, mean_squared_error
+from metrics import r2_score
+import tree
 
 # Training the Random Forest Regressor model using the training data set.
 data_frame = pandas.read_csv("random_forest_data.csv")
