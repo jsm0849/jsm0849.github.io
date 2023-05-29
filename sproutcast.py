@@ -4,6 +4,11 @@ import math
 from City import City
 from urllib.request import urlopen
 from datetime import datetime, timedelta
+import pandas
+import numpy
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 def is_number(string):
@@ -143,4 +148,16 @@ with streamlit.form("input_form"):
                     recent_rain = recent_rain + float(entries[k][2])
                     break
             currentDay = currentDay - timedelta(days=1)
+
+# Training the Random Forest Regressor model using the training data set.
+data_frame = pandas.read_csv("random_forest_data.csv")
+X = data_frame[7]
+y = data_frame.drop([7], axis=1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+regressor = RandomForestRegressor(n_estimators=20, random_state=0)
+regressor.fit(X_train, y_train)
+y_prediction = regressor.predict(X_test)
+streamlit.write("Mean absolute error: " + mean_absolute_error(y_test, y_prediction))
+streamlit.write("Mean squared error: " + mean_squared_error(y_test, y_prediction))
+
 connection.close()
