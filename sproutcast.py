@@ -6,9 +6,9 @@ from urllib.request import urlopen
 from datetime import datetime, timedelta
 import pandas
 import numpy
-from model_selection import train_test_split
-from ensemble import RandomForestRegressor
-from metrics import mean_absolute_error, mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 def is_number(string):
