@@ -182,7 +182,6 @@ with streamlit.form("output_form"):
             temp_array_dates.append(local_dates[len(local_dates) - (i + 1)])
         median_temperatures = temp_array_temps
         local_dates = temp_array_dates
-        streamlit.write(temp_array_dates)
         # Retrieving median temperature and rainfall for today and the next three days in the closest City to the user:
         for a in range(4):
             date_key = currentDay.strftime("%d/%m")
@@ -203,13 +202,13 @@ with streamlit.form("output_form"):
         # Determining soil water retention factor:
         soil_retention = float(soil_types[selected_soil])
         # Populating the user_data array:
-        user_data = [soil_retention,
-                     recent_rain,
-                     avg_rain_next,
-                     temp_this_week,
-                     avg_temp_next,
-                     avg_water_need,
-                     extra_water]
+        user_data.append([soil_retention,
+                         recent_rain,
+                         avg_rain_next,
+                         temp_this_week,
+                         avg_temp_next,
+                         avg_water_need,
+                         extra_water])
         # Training the Random Forest Regressor model using the training data set.
         data_frame = pandas.read_csv("random_forest_data.csv")
         y_train = numpy.array(data_frame["Water Today"])
@@ -217,6 +216,6 @@ with streamlit.form("output_form"):
         regressor = RandomForestRegressor()
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
-        streamlit.write(user_predict.reshape(-1, 1))
+        streamlit.write(user_predict)
 
 connection.close()
