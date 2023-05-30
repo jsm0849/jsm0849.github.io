@@ -169,7 +169,7 @@ with streamlit.form("input_form"):
 
 with streamlit.form("output_form"):
     if all_data_recorded:
-        user_data = []  # 2D array to hold the user's data for the Random Forest regression.
+        user_data = []  # Array to hold the user's data for the Random Forest regression.
         avg_water_need = 0  # Holds the average water needed by all selected plants.
         avg_rain_next = 0
         avg_temp_next = 0
@@ -203,13 +203,13 @@ with streamlit.form("output_form"):
         # Determining soil water retention factor:
         soil_retention = float(soil_types[selected_soil])
         # Populating the user_data array:
-        user_data.append([soil_retention,
-                          recent_rain,
-                          avg_rain_next,
-                          temp_this_week,
-                          avg_temp_next,
-                          avg_water_need,
-                          extra_water])
+        user_data = [soil_retention,
+                     recent_rain,
+                     avg_rain_next,
+                     temp_this_week,
+                     avg_temp_next,
+                     avg_water_need,
+                     extra_water]
         # Training the Random Forest Regressor model using the training data set.
         data_frame = pandas.read_csv("random_forest_data.csv")
         y_train = numpy.array(data_frame["Water Today"])
