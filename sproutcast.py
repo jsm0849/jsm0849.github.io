@@ -32,6 +32,7 @@ plant = []
 soil_types = {}     # Dictionary to hold the available soil types and their ability to retain water.
 soil = []
 plant_checkboxes = []   # Array of bools to hold the statuses of each checkbox.
+all_data_recorded = False  # Keeps track of the state of data collection.
 # Necessary data for the Random Forest algorithm:
 selected_plants = []    # Array to hold the plants the user has growing in their garden.
 selected_soil = ""      # Holds the soil type selected by the user.
@@ -39,6 +40,9 @@ inputZipcode = "0"      # Holds the zipcode of the user.
 recent_rain = 0         # Holds the amount of rain the user got within the last week (inches).
 city_id = ""            # Holds the ID of the City closest to the user for which there is data available.
 extra_water = ""        # Number of inches of extra water the user gave their garden in the last week.
+temp_this_week = 0      # Stores the average temperature of the week that ends today.
+median_temperatures = []  # Stores a pattern of temperatures for display purposes.
+local_dates = []  # Stores the dates close to today for display purposes.
 
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
@@ -103,6 +107,7 @@ with streamlit.form("input_form"):
 
     # Web scraper and other code to retrieve the necessary data:
     if allInputsValid:
+        median_temperatures = []
         selected_soil = str(streamlit.session_state["selectedSoil"])
         today = datetime.today()
         currentDay = today - timedelta(days=1)  # Holds the current date needed to loop through the past week.
@@ -149,20 +154,69 @@ with streamlit.form("input_form"):
                 if entries[k][0] == closest[0] and entries[k][1] == closest[1]:
                     recent_rain = recent_rain + float(entries[k][2])
                     break
+            # Retrieving median temperature for currentDay in the current City:
+            date_key = currentDay.strftime("%d/%m")
+            day_id = date_key + "_" + city.id
+            command = "SELECT * FROM days WHERE id = '" + day_id + "'"
+            cursor.execute(command)
+            day = cursor.fetchone()
+            temp_this_week = temp_this_week + float(day[1])
+            median_temperatures.append(float(day[1]))
+            local_dates.append(date_key)
             currentDay = currentDay - timedelta(days=1)
+        temp_this_week = temp_this_week / 6
+        all_data_recorded = True
 
-# Training the Random Forest Regressor model using the training data set.
-data_frame = pandas.read_csv("random_forest_data.csv")
-X = numpy.array(data_frame["Water Today"])
-y = data_frame.drop(["Water Today"], axis=1)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-tree_regressor = tree.DecisionTreeRegressor()
-tree_regressor.fit(X_train.reshape(-1, 1), y_train)
-ytrainpredict = tree_regressor.predict(X_train.reshape(-1, 1))
-ytestpredict = tree_regressor.predict(X_test.reshape(-1, 1))
-print("Mean absolute error: " + str(mean_absolute_error(y_test, ytestpredict)))
-print("Mean squared error: " + str(mean_squared_error(y_test, ytestpredict)))
-print("R2 test score: " + str(r2_score(y_test, ytestpredict)))
-print("R2 training score: " + str(r2_score(y_train, ytrainpredict)))
+with streamlit.form("output_form"):
+    if all_data_recorded:
+        user_data = []  # 2D array to hold the user's data for the Random Forest regression.
+        avg_water_need = 0  # Holds the average water needed by all selected plants.
+        avg_rain_next = 0
+        avg_temp_next = 0
+        soil_retention = 0  # Holds the water retention factor of the selected soil type.
+        # Reversing the order of median_temperatures and local_dates:
+        temp_array_temps = []
+        temp_array_dates = []
+        for i in range(len(median_temperatures)):
+            temp_array_temps.append(median_temperatures[len(median_temperatures - (i + 1))])
+            temp_array_dates.append(local_dates[len(local_dates) - (i + 1)])
+        median_temperatures = temp_array_temps
+        local_dates = temp_array_dates
+        streamlit.write(temp_array_dates)
+        # Retrieving median temperature and rainfall for today and the next three days in the closest City to the user:
+        for a in range(4):
+            date_key = currentDay.strftime("%d/%m")
+            day_id = date_key + "_" + city.id
+            command = "SELECT * FROM days WHERE id = '" + day_id + "'"
+            cursor.execute(command)
+            day = cursor.fetchone()
+            avg_temp_next = avg_temp_next + float(day[1])
+            median_temperatures.append(float(day[1]))
+            local_dates.append(date_key)
+            avg_rain_next = avg_rain_next + float(day[2])
+        avg_temp_next = avg_temp_next / 4
+        avg_rain_next = avg_rain_next / 4
+        # Determining average water need for selected plants:
+        for i in range(len(selected_plants)):
+            avg_water_need = avg_water_need + float(plant_types[selected_plants[i]])
+        avg_water_need = avg_water_need / len(selected_plants)
+        # Determining soil water retention factor:
+        soil_retention = float(soil_types[selected_soil])
+        # Populating the user_data array:
+        user_data.append([soil_retention,
+                          recent_rain,
+                          avg_rain_next,
+                          temp_this_week,
+                          avg_temp_next,
+                          avg_water_need,
+                          extra_water])
+        # Training the Random Forest Regressor model using the training data set.
+        data_frame = pandas.read_csv("random_forest_data.csv")
+        y_train = numpy.array(data_frame["Water Today"])
+        X_train = data_frame.drop(["Water Today"], axis=1)
+        regressor = RandomForestRegressor()
+        regressor.fit(y_train.reshape(-1, 1), X_train)
+        user_predict = regressor.predict(user_data)
+        streamlit.write(user_predict)
 
 connection.close()
