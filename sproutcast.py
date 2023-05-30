@@ -167,7 +167,7 @@ with streamlit.form("input_form"):
         temp_this_week = temp_this_week / 6
         all_data_recorded = True
 
-with streamlit.form("output_form"):
+with streamlit.container("output_container"):
     if all_data_recorded:
         user_data = []  # Array to hold the user's data for the Random Forest regression.
         avg_water_need = 0  # Holds the average water needed by all selected plants.
@@ -217,5 +217,7 @@ with streamlit.form("output_form"):
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
         streamlit.write(user_predict)
+        temp_chart_data = pandas.DataFrame(local_dates, median_temperatures)
+        streamlit.line_chart(temp_chart_data)
 
 connection.close()
