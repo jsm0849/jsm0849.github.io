@@ -217,6 +217,6 @@ with streamlit.form("output_form"):
         regressor = RandomForestRegressor()
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
-        streamlit.write(user_predict)
+        streamlit.write(user_predict.reshape(-1, 1))
 
 connection.close()
