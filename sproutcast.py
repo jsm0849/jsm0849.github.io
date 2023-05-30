@@ -167,7 +167,7 @@ with streamlit.form("input_form"):
         temp_this_week = temp_this_week / 6
         all_data_recorded = True
 
-with streamlit.container("output_container"):
+with streamlit.container():
     if all_data_recorded:
         user_data = []  # Array to hold the user's data for the Random Forest regression.
         avg_water_need = 0  # Holds the average water needed by all selected plants.
