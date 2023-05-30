@@ -178,7 +178,7 @@ with streamlit.form("output_form"):
         temp_array_temps = []
         temp_array_dates = []
         for i in range(len(median_temperatures)):
-            temp_array_temps.append(median_temperatures[len(median_temperatures - (i + 1))])
+            temp_array_temps.append(median_temperatures[len(median_temperatures) - (i + 1)])
             temp_array_dates.append(local_dates[len(local_dates) - (i + 1)])
         median_temperatures = temp_array_temps
         local_dates = temp_array_dates
