@@ -215,7 +215,7 @@ with streamlit.form("output_form"):
         y_train = numpy.array(data_frame["Water Today"])
         X_train = data_frame.drop(["Water Today"], axis=1)
         regressor = RandomForestRegressor()
-        regressor.fit(y_train.reshape(-1, 1), X_train)
+        regressor.fit(X_train, X_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
         streamlit.write(user_predict)
 
