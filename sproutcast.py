@@ -6,7 +6,7 @@ from urllib.request import urlopen
 from datetime import datetime, timedelta
 import pandas
 import numpy
-from sklearn.model_selection import train_test_split
+from PIL import Image
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn import tree
@@ -69,6 +69,8 @@ cursor = connection.cursor()
 # Form to take user inputs
 textValid = False   # Bool indicating whether the text field inputs were valid.
 allInputsValid = False  # Bool indicating whether all input fields are valid.
+image = Image.open("sproutcast.png")
+streamlit.image(image, caption="SproutCast logo")
 streamlit.header(f"Welcome to SproutCast! Your Gardening Companion")
 streamlit.subheader(f"Tell us about your garden! Please enter your information below. SproutCast will use your inputs" +
                     " along with local weather data to predict how much water you should be giving your garden " +
