@@ -231,14 +231,13 @@ with streamlit.container():
         regressor = RandomForestRegressor()
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
-        streamlit.write(len(median_temperatures), len(local_dates), len(recent_rains), len(rain_dates))
-        temp_chart_data = pandas.DataFrame(median_temperatures, local_dates, columns=["Temps in your Area (F)"])
-        streamlit.line_chart(temp_chart_data)
-        rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns=["Recent Rainfall in your Area (in)"])
-        streamlit.line_chart(rain_chart_data)
         output_string = str(round(float(user_predict), 2))
-        streamlit.write("Based on all inputted data, recent rainfall in your area, typical temperatures for this time" +
+        streamlit.write("Based on all input data, recent rainfall in your area, typical temperatures for this time" +
                         " of year, water needs of your plants, and other data, you need to give your garden " +
                         output_string + " inches of water distributed over the next two or three days.")
+        temp_chart_data = pandas.DataFrame(median_temperatures, local_dates, columns=["Temps in your Area (F)"])
+        streamlit.line_chart(temp_chart_data)
+        rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns=["Rainfall in your Area (in)"])
+        streamlit.line_chart(rain_chart_data)
 
 connection.close()
