@@ -69,7 +69,10 @@ cursor = connection.cursor()
 # Form to take user inputs
 textValid = False   # Bool indicating whether the text field inputs were valid.
 allInputsValid = False  # Bool indicating whether all input fields are valid.
-streamlit.header(f"Tell us about your garden! Please enter your information below.")
+streamlit.header(f"Welcome to SproutCast! Your Gardening Companion")
+streamlit.subheader(f"Tell us about your garden! Please enter your information below. SproutCast will use your inputs" +
+                    " along with local weather data to predict how much water you should be giving your garden " +
+                    "using machine learning!")
 with streamlit.form("input_form"):
     col1, col2, col3 = streamlit.columns(3)
     col1.text_input("Enter your five digit zipcode:", key="inputZipcode")
@@ -231,10 +234,10 @@ with streamlit.container():
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
         output_string = str(round(float(user_predict), 2))
-        streamlit.write("Based on all input data, recent rainfall in your area, typical temperatures for this time" +
-                        " of year, water needs of your plants, and other data, you need to give your garden " +
-                        output_string + " inches of water distributed over the next two or three days" +
-                        " to keep your plants healthy.")
+        streamlit.text("Based on all input data, recent rainfall in your area, typical temperatures for this time" +
+                       " of year, water needs of your plants, and other data, you need to give your garden " +
+                       ":blue[" + output_string + "] inches of water distributed over the next two or three days" +
+                       " to keep your plants healthy.")
         display_rains = []
         display_rain_dates = []
         currentDay = today - timedelta(days=1)
