@@ -237,8 +237,9 @@ with streamlit.container():
         output_string_gallons = str(round(float(user_predict) * 0.62, 2))
         streamlit.subheader("Based on all input data, recent rainfall in your area, typical temperatures for this time" +
                             " of year, water needs of your plants, and other data, you need to give your garden " +
-                            ":blue[" + output_string + "] inches of water distributed over the next two or three days" +
-                            " (or :blue[" + output_string_gallons + "] gallons per square foot) to keep your plants healthy.")
+                            ":blue[" + output_string + "] inches of water (or :blue[" +
+                            output_string_gallons + "] gallons per square foot) distributed over the next two or three days" +
+                            " to keep your plants healthy.")
         display_rains = []
         display_rain_dates = []
         currentDay = today - timedelta(days=1)
@@ -261,5 +262,6 @@ with streamlit.container():
         streamlit.line_chart(temp_chart_data)
         rain_chart_data = pandas.DataFrame(display_rains, display_rain_dates, columns=["Rainfall in your Area (in)"])
         streamlit.line_chart(rain_chart_data)
+        streamlit.caption("05/30/2022 Created by Jacob Smith. github.com/jsm0849")
 
 connection.close()
