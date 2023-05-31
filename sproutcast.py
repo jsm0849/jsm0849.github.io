@@ -70,7 +70,7 @@ cursor = connection.cursor()
 textValid = False   # Bool indicating whether the text field inputs were valid.
 allInputsValid = False  # Bool indicating whether all input fields are valid.
 image = Image.open("sproutcast.png")
-streamlit.image(image, caption="SproutCast logo")
+streamlit.image(image)
 streamlit.header(f"Welcome to SproutCast! Your Gardening Companion")
 streamlit.subheader(f"Tell us about your garden! Please enter your information below. SproutCast will use your inputs" +
                     " along with local weather data to predict how much water you should be giving your garden " +
