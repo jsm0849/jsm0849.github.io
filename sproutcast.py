@@ -43,6 +43,8 @@ extra_water = ""        # Number of inches of extra water the user gave their ga
 temp_this_week = 0      # Stores the average temperature of the week that ends today.
 median_temperatures = []  # Stores a pattern of temperatures for display purposes.
 local_dates = []  # Stores the dates close to today for display purposes.
+recent_rains = []  # Stores the recent rains for the user's area.
+rain_dates = []  # Stores relevant dates for recent rains.
 
 # Connecting to the database
 connection = sqlite3.connect("DB.db")
@@ -108,6 +110,9 @@ with streamlit.form("input_form"):
     # Web scraper and other code to retrieve the necessary data:
     if allInputsValid:
         median_temperatures = []
+        local_dates = []
+        recent_rains = []
+        rain_dates = []
         selected_soil = str(streamlit.session_state["selectedSoil"])
         today = datetime.today()
         currentDay = today - timedelta(days=1)  # Holds the current date needed to loop through the past week.
@@ -153,6 +158,7 @@ with streamlit.form("input_form"):
             for k in range(len(entries) - 1):
                 if entries[k][0] == closest[0] and entries[k][1] == closest[1]:
                     recent_rain = recent_rain + float(entries[k][2])
+                    recent_rains.append(float(entries[k][2]))
                     break
             # Retrieving median temperature for currentDay in the current City:
             date_key = currentDay.strftime("%d/%m")
@@ -163,6 +169,7 @@ with streamlit.form("input_form"):
             temp_this_week = temp_this_week + float(day[1])
             median_temperatures.append(float(day[1]))
             local_dates.append(date_key)
+            rain_dates.append(date_key)
             currentDay = currentDay - timedelta(days=1)
         temp_this_week = temp_this_week / 6
         all_data_recorded = True
@@ -177,11 +184,19 @@ with streamlit.container():
         # Reversing the order of median_temperatures and local_dates:
         temp_array_temps = []
         temp_array_dates = []
+        temp_rains = []
+        temp_rain_dates = []
         for i in range(len(median_temperatures)):
             temp_array_temps.append(median_temperatures[len(median_temperatures) - (i + 1)])
             temp_array_dates.append(local_dates[len(local_dates) - (i + 1)])
         median_temperatures = temp_array_temps
         local_dates = temp_array_dates
+        # Reversing the order of recent_rains and rain_dates:
+        for i in range(len(recent_rains)):
+            temp_rains.append(recent_rains[len(recent_rains) - (i + 1)])
+            temp_rain_dates.append(rain_dates[len(rain_dates) - (i + 1)])
+        recent_rains = temp_rains
+        rain_dates = temp_rain_dates
         # Retrieving median temperature and rainfall for today and the next three days in the closest City to the user:
         for a in range(4):
             date_key = currentDay.strftime("%d/%m")
@@ -217,7 +232,11 @@ with streamlit.container():
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
         streamlit.write(user_predict)
-        temp_chart_data = pandas.DataFrame(local_dates, median_temperatures)
+        temp_chart_data = pandas.DataFrame(median_temperatures, local_dates, columns="Typical Temperatures in your Area")
         streamlit.line_chart(temp_chart_data)
+        rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns="Recent Rainfall in your Area")
+        streamlit.write("""Based on all inputted data, recent rainfall in your area, typical temperatures for this time
+                        of year, water needs of your plants, and other data, you need to give your garden """ +
+                        round(float(user_data), 2)) + " inches of water distributed over the next two or three days."
 
 connection.close()
