@@ -234,7 +234,7 @@ with streamlit.container():
         regressor.fit(X_train, y_train.reshape(-1, 1))
         user_predict = regressor.predict(user_data)
         output_string = str(round(float(user_predict), 2))
-        output_string_gallons = str(round(float(user_predict) * 0.62), 2)
+        output_string_gallons = str(round(float(user_predict) * 0.62, 2))
         streamlit.subheader("Based on all input data, recent rainfall in your area, typical temperatures for this time" +
                             " of year, water needs of your plants, and other data, you need to give your garden " +
                             ":blue[" + output_string + "] inches of water distributed over the next two or three days" +
