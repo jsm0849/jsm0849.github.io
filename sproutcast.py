@@ -176,6 +176,8 @@ with streamlit.form("input_form"):
 
 with streamlit.container():
     if all_data_recorded:
+        today = datetime.today()
+        currentDay = today  # Holds the current date needed to loop through the next few days.
         user_data = []  # Array to hold the user's data for the Random Forest regression.
         avg_water_need = 0  # Holds the average water needed by all selected plants.
         avg_rain_next = 0
@@ -208,6 +210,7 @@ with streamlit.container():
             median_temperatures.append(float(day[1]))
             local_dates.append(currentDay.strftime("%m/%d"))
             avg_rain_next = avg_rain_next + float(day[2])
+            currentDay = currentDay + timedelta(days=1)
         avg_temp_next = avg_temp_next / 4
         avg_rain_next = avg_rain_next / 4
         # Determining average water need for selected plants:
@@ -236,6 +239,13 @@ with streamlit.container():
                         " of year, water needs of your plants, and other data, you need to give your garden " +
                         output_string + " inches of water distributed over the next two or three days" +
                         " to keep your plants healthy.")
+        display_rains = []
+        display_rain_dates = []
+        currentDay = today - timedelta(days=1)
+        """for i in range(6):
+            date_text = currentDay.strftime("%m/%d")
+            if rain_dates.__contains__(date_text):
+                display_rains.append(recent_rains)"""
         temp_chart_data = pandas.DataFrame(median_temperatures, local_dates, columns=["Temps in your Area (F)"])
         streamlit.line_chart(temp_chart_data)
         rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns=["Rainfall in your Area (in)"])
