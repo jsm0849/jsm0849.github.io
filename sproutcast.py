@@ -212,6 +212,9 @@ with streamlit.container():
         avg_water_need = avg_water_need / len(selected_plants)
         # Determining soil water retention factor:
         soil_retention = float(soil_types[selected_soil])
+        # Checking to see if extra_water is blank:
+        if extra_water == '':
+            extra_water = 0
         # Populating the user_data array:
         user_data.append([soil_retention,
                          recent_rain,
