@@ -237,7 +237,7 @@ with streamlit.container():
         currentDay = today - timedelta(days=1)
         for i in range(6):
             date_text = currentDay.strftime("%m/%d")
-            for j in range(len(rain_dates)):
+            for j in range(len(recent_rains)):
                 if rain_dates[j] == date_text:
                     display_rains.append(recent_rains[j])
                 else:
