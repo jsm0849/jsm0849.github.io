@@ -182,23 +182,16 @@ with streamlit.container():
         avg_water_need = 0  # Holds the average water needed by all selected plants.
         avg_rain_next = 0
         avg_temp_next = 0
-        soil_retention = 0  # Holds the water retention factor of the selected soil type.
-        # Reversing the order of median_temperatures and local_dates:
         temp_array_temps = []
         temp_array_dates = []
         temp_rains = []
         temp_rain_dates = []
+        # Reversing the order of median_temperatures and local_dates:
         for i in range(len(median_temperatures)):
             temp_array_temps.append(median_temperatures[len(median_temperatures) - (i + 1)])
             temp_array_dates.append(local_dates[len(local_dates) - (i + 1)])
         median_temperatures = temp_array_temps
         local_dates = temp_array_dates
-        # Reversing the order of recent_rains and rain_dates:
-        for i in range(len(recent_rains)):
-            temp_rains.append(recent_rains[len(recent_rains) - (i + 1)])
-            temp_rain_dates.append(rain_dates[len(rain_dates) - (i + 1)])
-        recent_rains = temp_rains
-        rain_dates = temp_rain_dates
         # Retrieving median temperature and rainfall for today and the next three days in the closest City to the user:
         for a in range(4):
             date_key = currentDay.strftime("%d/%m")
@@ -242,13 +235,24 @@ with streamlit.container():
         display_rains = []
         display_rain_dates = []
         currentDay = today - timedelta(days=1)
-        """for i in range(6):
+        for i in range(6):
             date_text = currentDay.strftime("%m/%d")
-            if rain_dates.__contains__(date_text):
-                display_rains.append(recent_rains)"""
+            for j in range(len(rain_dates)):
+                if rain_dates[j] == date_text:
+                    display_rains.append(recent_rains[j])
+                else:
+                    display_rains.append(0)
+            display_rain_dates.append(date_text)
+            currentDay = currentDay - timedelta(days=1)
+        # Reversing the order of display_rains and display_rain_dates:
+        for i in range(len(display_rains)):
+            temp_rains.append(display_rains[len(display_rains) - (i + 1)])
+            temp_rain_dates.append(display_rain_dates[len(display_rain_dates) - (i + 1)])
+        display_rains = temp_rains
+        display_rain_dates = temp_rain_dates
         temp_chart_data = pandas.DataFrame(median_temperatures, local_dates, columns=["Temps in your Area (F)"])
         streamlit.line_chart(temp_chart_data)
-        rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns=["Rainfall in your Area (in)"])
+        rain_chart_data = pandas.DataFrame(display_rains, display_rain_dates, columns=["Rainfall in your Area (in)"])
         streamlit.line_chart(rain_chart_data)
 
 connection.close()
