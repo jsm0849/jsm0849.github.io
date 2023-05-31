@@ -168,8 +168,8 @@ with streamlit.form("input_form"):
             day = cursor.fetchone()
             temp_this_week = temp_this_week + float(day[1])
             median_temperatures.append(float(day[1]))
-            local_dates.append(date_key)
-            rain_dates.append(date_key)
+            local_dates.append(currentDay.strftime("%m/%d"))
+            rain_dates.append(currentDay.strftime("%m/%d"))
             currentDay = currentDay - timedelta(days=1)
         temp_this_week = temp_this_week / 6
         all_data_recorded = True
@@ -206,7 +206,7 @@ with streamlit.container():
             day = cursor.fetchone()
             avg_temp_next = avg_temp_next + float(day[1])
             median_temperatures.append(float(day[1]))
-            local_dates.append(date_key)
+            local_dates.append(currentDay.strftime("%m/%d"))
             avg_rain_next = avg_rain_next + float(day[2])
         avg_temp_next = avg_temp_next / 4
         avg_rain_next = avg_rain_next / 4
