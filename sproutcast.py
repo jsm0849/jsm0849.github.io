@@ -81,6 +81,7 @@ with streamlit.form("input_form"):
     with streamlit.expander("Select which plants you are growing in your garden"):
         for i in range(len(plant)):
             plant_checkboxes.append(streamlit.checkbox(label=f"{plant[i]}", key=plant[i]))
+    streamlit.caption("Using a rain gauge when watering your plants helps ensure accurate measurement.")
     "---"
     submitted = streamlit.form_submit_button("Submit Form")
 
