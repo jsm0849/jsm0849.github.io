@@ -236,6 +236,6 @@ with streamlit.container():
         rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns=["Recent Rainfall in your Area"])
         streamlit.write("""Based on all inputted data, recent rainfall in your area, typical temperatures for this time
                         of year, water needs of your plants, and other data, you need to give your garden """ +
-                        round(float(user_data[0]), 2)) + " inches of water distributed over the next two or three days."
+                        round(float(user_data[0][0]), 2)) + " inches of water distributed over the next two or three days."
 
 connection.close()
