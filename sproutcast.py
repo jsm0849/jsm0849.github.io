@@ -234,8 +234,9 @@ with streamlit.container():
         temp_chart_data = pandas.DataFrame(median_temperatures, local_dates, columns=["Typical Temperatures in your Area"])
         streamlit.line_chart(temp_chart_data)
         rain_chart_data = pandas.DataFrame(recent_rains, rain_dates, columns=["Recent Rainfall in your Area"])
-        streamlit.write("""Based on all inputted data, recent rainfall in your area, typical temperatures for this time
-                        of year, water needs of your plants, and other data, you need to give your garden """ +
-                        str(round(float(user_data[0][0]), 2))) + " inches of water distributed over the next two or three days."
+        output_string = str(round(float(user_predict), 2))
+        streamlit.write("Based on all inputted data, recent rainfall in your area, typical temperatures for this time" +
+                        " of year, water needs of your plants, and other data, you need to give your garden " +
+                        output_string + " inches of water distributed over the next two or three days.")
 
 connection.close()
