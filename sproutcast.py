@@ -8,9 +8,6 @@ import pandas
 import numpy
 from PIL import Image
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from sklearn import tree
-from sklearn.metrics import r2_score
 
 
 def is_number(string):
@@ -265,6 +262,6 @@ with streamlit.container():
         streamlit.line_chart(temp_chart_data)
         rain_chart_data = pandas.DataFrame(display_rains, display_rain_dates, columns=["Rainfall in your Area (in)"])
         streamlit.line_chart(rain_chart_data)
-        streamlit.caption("05/30/2022 Created by Jacob Smith. github.com/jsm0849")
+        streamlit.caption("05/30/2023 Created by Jacob Smith. github.com/jsm0849")
 
 connection.close()
